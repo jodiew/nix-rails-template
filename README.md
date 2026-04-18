@@ -20,3 +20,7 @@ Commands Available:
 Gem Workflow:
 
 `bundle add GEM --skip-install` -> `bundle-lock` -> `bundix`
+
+Rails init:
+
+`rails new . --name=APP_NAME --skip-bundle`
