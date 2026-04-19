@@ -23,7 +23,7 @@ Gem Workflow:
 
 Rails init:
 
-`rails new . --name=APP_NAME --skip-bundle --database=postgres --skip-git`
+`rails new . --name=APP_NAME --database=postgresql --skip-bundle --skip-git`
 
 PostgreSQL commands:
 
@@ -33,5 +33,6 @@ PostgreSQL commands:
 
 `pg_ctl -D .tmp/mydb stop`
 
-`createdb mydb --host="$PWD"`
+`createdb <linux_username> --host="$PWD"`
 
+update `config/database.yaml` to have `host: PWD`
