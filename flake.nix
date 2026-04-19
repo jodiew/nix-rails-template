@@ -73,10 +73,17 @@
         ]
         ++ (with pkgs; [
           yarn
-          rufo
-          sqlite
+          libpq
+          pkg-config
+          postgresql_18
+          libxml2
+          libxslt
         ]);
       };
+
+      shellHook = ''
+        export RAILS_ENV=development
+      '';
 
       ### Commands Available
       # bundle-lock

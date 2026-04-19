@@ -23,4 +23,15 @@ Gem Workflow:
 
 Rails init:
 
-`rails new . --name=APP_NAME --skip-bundle`
+`rails new . --name=APP_NAME --skip-bundle --database=postgres --skip-git`
+
+PostgreSQL commands:
+
+`initdb -D .tmp/mydb`
+
+`pg_ctl -D .tmp/mydb -l logfile -o "--unix_socket_directories='$PWD'" start`
+
+`pg_ctl -D .tmp/mydb stop`
+
+`createdb mydb --host="$PWD"`
+
