@@ -1,13 +1,16 @@
 {
     "nixEnvSelector.nixFile": "${workspaceFolder}/flake.nix",
     "rubyLsp.rubyVersionManager": {
-        "identifier": "none"
+        "identifier": "none",
     },
     "[ruby]": {
         "editor.defaultFormatter": "Shopify.ruby-lsp",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll.rubyLsp": "explicit"
-        }
-    }
+            "source.fixAll.rubyLsp": "explicit",
+        },
+    },
+    "[erb]": {
+        "editor.tabSize": 2,
+    },
 }
