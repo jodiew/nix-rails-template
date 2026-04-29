@@ -1,94 +1,43 @@
+# flake.nix
 {
   description = "Nix flake for developing rails projects in vscode";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    ruby-nix.url = "github:inscapist/ruby-nix";
-    # a fork that supports platform dependant gem
-    bundix = {
-      url = "github:inscapist/bundix/main";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    bob-ruby = {
-      url = "github:bobvanderlinden/nixpkgs-ruby";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      ruby-nix,
-      bundix,
-      bob-ruby,
-    }:
+    { self, nixpkgs }:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs {
-        inherit system;
-        overlays = [ bob-ruby.overlays.default ];
-      };
-      rubyNix = ruby-nix.lib pkgs;
-
-      # TODO generate gemset.nix with bundix
-      gemset = if builtins.pathExists ./gemset.nix then import ./gemset.nix else { };
-
-      # If you want to override gem build config, see
-      #   https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/ruby-modules/gem-config/default.nix
-      gemConfig = { };
-
-      # See available versions here: https://github.com/bobvanderlinden/nixpkgs-ruby/blob/master/ruby/versions.json
-      ruby = pkgs."ruby-4.0.2";
-
-      # Running bundix would regenerate `gemset.nix`
-      bundixcli = bundix.packages.${system}.default;
-
-      # Use these instead of the original `bundle <mutate>` commands
-      bundleLock = pkgs.writeShellScriptBin "bundle-lock" ''
-        export BUNDLE_PATH=vendor/bundle
-        bundle lock
-      '';
-      bundleUpdate = pkgs.writeShellScriptBin "bundle-update" ''
-        export BUNDLE_PATH=vendor/bundle
-        bundle lock --update
-      '';
+      pkgs = nixpkgs.legacyPackages.x86_64-linux;
     in
-    rec {
-      inherit
-        (rubyNix {
-          inherit gemset ruby;
-          name = "my-rails-app";
-          gemConfig = pkgs.defaultGemConfig // gemConfig;
-        })
-        env
-        ;
-
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = [
-          env
-          bundixcli
-          bundleLock
-          bundleUpdate
-        ]
-        ++ (with pkgs; [
-          yarn
-          libpq
+    {
+      devShells.x86_64-linux.default = pkgs.mkShell {
+        packages = with pkgs; [
+          ruby_4_0 # pin the interpreter
+          bundler
+          nodejs_25 # for asset pipeline / esbuild
+          postgresql_18 # for pg gem native ext
+          libpq # headers for pg gem
+          libyaml # for psych
           pkg-config
-          postgresql_18
-          libxml2
-          libxslt
-        ]);
+          gcc
+        ];
+
+        # Redirect gem installs into the project dir
+        shellHook = ''
+          export GEM_HOME="$PWD/.gems"
+          export PATH="$GEM_HOME/bin:$PATH"
+          export BUNDLE_PATH="$PWD/.bundle"
+
+          ruby --version
+          gem install rails ruby-lsp rubocop rubocop-ast rubocop-capybara rubocop-rails rubocop-rspec
+          rails --version
+          if [ ! -d tmp/mydb ]; then
+            initdb -D tmp/mydb
+          fi
+          if ! pg_ctl -D tmp/mydb status; then
+            pg_ctl -D tmp/mydb -l log/mydb_logfile -o "--unix_socket_directories='$PWD/tmp'" start
+          fi
+        '';
       };
-
-      shellHook = ''
-        export RAILS_ENV=development
-      '';
-
-      ### Commands Available
-      # bundle-lock
-      # bundle-update
-      # bundix
-
     };
 }

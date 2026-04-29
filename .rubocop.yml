@@ -1,8 +1,0 @@
-# RuboCop plugins and rules [https://rubocop.org/]
-plugins:
-  - rubocop-capybara
-  - rubocop-rails
-  - rubocop-rspec
-
-AllCops:
-  NewCops: enable
