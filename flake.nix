@@ -29,7 +29,9 @@
           export BUNDLE_PATH="$PWD/.bundle"
 
           ruby --version
-          gem install rails ruby-lsp rubocop rubocop-ast rubocop-capybara rubocop-rails rubocop-rspec
+          if ! gem list -i "^rails$"; then
+            gem install rails ruby-lsp rubocop rubocop-ast rubocop-capybara rubocop-rails rubocop-rspec
+          fi
           rails --version
           if [ ! -d tmp/mydb ]; then
             initdb -D tmp/mydb
