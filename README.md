@@ -11,28 +11,14 @@ Dependencies:
     - mkhl.direnv
     - shopify.ruby-lsp
 
-Commands Available:
-
-- `bundle-lock`
-- `bundle-update`
-- `bundix`
-
-Gem Workflow:
-
-`bundle add GEM --skip-install` -> `bundle-lock` -> `bundix`
-
 Rails init:
 
-`rails new . --name=APP_NAME --database=postgresql --skip-bundle --skip-git`
+`rails new . --name=APP_NAME --database=postgresql`
 
 PostgreSQL commands:
 
-`initdb -D .tmp/mydb`
+`pg_ctl -D tmp/mydb stop`
 
-`pg_ctl -D .tmp/mydb -l logfile -o "--unix_socket_directories='$PWD'" start`
+`createdb <linux_username> --host="$PWD/tmp"`
 
-`pg_ctl -D .tmp/mydb stop`
-
-`createdb <linux_username> --host="$PWD"`
-
-update `config/database.yaml` to have `host: PWD`
+update `config/database.yaml` to have `host: PWD/tmp`
