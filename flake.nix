@@ -20,6 +20,8 @@
           libyaml # for psych
           pkg-config
           gcc
+          chromedriver # for selenium tests
+          chromium # for version match
         ];
 
         # Redirect gem installs into the project dir
